@@ -52,7 +52,7 @@ use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use time::{macros::format_description, OffsetDateTime};
 
-static COMPILE_TIME: Lazy<OffsetDateTime> = Lazy::new(|| OffsetDateTime::now_utc());
+static COMPILE_TIME: Lazy<OffsetDateTime> = Lazy::new(OffsetDateTime::now_utc);
 
 /// Compile date as `time::Date`.
 #[proc_macro]
