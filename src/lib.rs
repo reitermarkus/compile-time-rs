@@ -1,6 +1,6 @@
-//! This crate allows inserting the compile time, at compile time, either as
+//! This crate provides macros for getting the compile time, at compile time, either as
 //! [`time::Date`](time::Date), [`time::Time`](time::Time),
-//! [`time::OffsetDateTime`](time::OffsetDateTime), as a string, or as a UNIX timestamp.
+//! [`time::OffsetDateTime`](time::OffsetDateTime), string, or UNIX timestamp.
 //!
 //! # Example
 //!

@@ -2,6 +2,14 @@
 name = "compile-time"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+readme = "ReadMe.md"
+description = "Macros for getting the compile time at compile time."
+documentation = "https://docs.rs/compile-time"
+repository = "https://github.com/reitermarkus/compile-time-rs"
+homepage = "https://github.com/reitermarkus/compile-time-rs"
+keywords = ["compilation"]
+categories = ["proc-macro"]
 
 [lib]
 proc-macro = true
