@@ -36,7 +36,7 @@
 //! assert_eq!(COMPILE_DATETIME_STRING, datetime_string);
 //!
 //! // UNIX time in seconds.
-//! assert_eq!(COMPILE_DATETIME.unix_timestamp(), compile_time::unix());
+//! assert_eq!(COMPILE_DATETIME.unix_timestamp(), compile_time::unix!());
 //! #
 //! # // Additional sanity check.
 //! # let now = time::OffsetDateTime::now_utc();
