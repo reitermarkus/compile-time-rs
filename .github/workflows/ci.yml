@@ -1,0 +1,9 @@
+on: [pull_request, push]
+
+name: CI
+
+jobs:
+  ci:
+    uses: reitermarkus/.github/.github/workflows/cargo-build-publish.yml@main
+    secrets:
+      CRATESIO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
