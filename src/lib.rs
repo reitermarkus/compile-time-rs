@@ -1,3 +1,50 @@
+//! This crate allows inserting the compile time, at compile time, either as
+//! [`time::Date`](time::Date), [`time::Time`](time::Time),
+//! [`time::OffsetDateTime`](time::OffsetDateTime), as a string, or as a UNIX timestamp.
+//!
+//! # Example
+//!
+//! ```
+//! const COMPILE_DATE: time::Date = compile_time::date!();
+//! const COMPILE_TIME: time::Time = compile_time::time!();
+//! const COMPILE_DATETIME: time::OffsetDateTime = compile_time::datetime!();
+//!
+//! const COMPILE_DATE_STRING: &str = compile_time::date_str!();
+//! const COMPILE_TIME_STRING: &str = compile_time::time_str!();
+//! const COMPILE_DATETIME_STRING: &str = compile_time::datetime_str!();
+//!
+//! // Evaluation is only done once.
+//! # std::thread::sleep(std::time::Duration::from_secs(1));
+//! assert_eq!(COMPILE_DATETIME, compile_time::datetime!());
+//!
+//! // Date string is formatted as yyyy-MM-dd.
+//! let year = COMPILE_DATETIME.year();
+//! let month: u8 = COMPILE_DATETIME.month().into();
+//! let day = COMPILE_DATETIME.day();
+//! let date_string = format!("{year:04}-{month:02}-{day:02}");
+//! assert_eq!(COMPILE_DATE_STRING, date_string);
+//!
+//! // Time is formatted as hh:mm::ss.
+//! let hour = COMPILE_DATETIME.hour();
+//! let minute = COMPILE_DATETIME.minute();
+//! let second = COMPILE_DATETIME.second();
+//! let time_string = format!("{hour:02}:{minute:02}:{second:02}");
+//! assert_eq!(COMPILE_TIME_STRING, time_string);
+//!
+//! // Date-time is formatted as yyyy-MM-ddThh:mm::ssZ.
+//! let datetime_string = format!("{date_string}T{time_string}Z");
+//! assert_eq!(COMPILE_DATETIME_STRING, datetime_string);
+//!
+//! // UNIX time in seconds.
+//! assert_eq!(COMPILE_DATETIME.unix_timestamp(), compile_time::unix());
+//! #
+//! # // Additional sanity check.
+//! # let now = time::OffsetDateTime::now_utc();
+//! # let yesterday = now.saturating_sub(time::Duration::days(1));
+//! # assert!(COMPILE_DATETIME > yesterday);
+//! # assert!(COMPILE_DATETIME < now);
+//! ```
+
 extern crate proc_macro;
 
 use once_cell::sync::Lazy;
@@ -109,7 +156,7 @@ pub fn datetime(_item: TokenStream) -> TokenStream {
   proc_macro::TokenStream::from(output)
 }
 
-/// Compile time as `&'static str` in `YYYY-MM-DDThh:mm:ssZ` format.
+/// Compile time as `&'static str` in `yyyy-MM-ddThh:mm:ssZ` format.
 #[proc_macro]
 pub fn datetime_str(_item: TokenStream) -> TokenStream {
   let datetime = *COMPILE_TIME;
