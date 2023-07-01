@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 readme = "ReadMe.md"
-description = "Macros for getting the compile time at compile time."
+description = "Macros for getting compile time information."
 documentation = "https://docs.rs/compile-time"
 repository = "https://github.com/reitermarkus/compile-time-rs"
 homepage = "https://github.com/reitermarkus/compile-time-rs"
@@ -15,7 +15,9 @@ categories = ["proc-macro"]
 proc-macro = true
 
 [dependencies]
+once_cell = "1"
 proc-macro2 = "1.0"
 quote = "1.0"
+rustc_version = "0.4"
+semver = "1"
 time = { version = "0.3.17", features = ["macros", "formatting"] }
-once_cell = "1"
