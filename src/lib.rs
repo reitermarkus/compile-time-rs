@@ -5,7 +5,7 @@
 //! [`time::OffsetDateTime`](time::OffsetDateTime), string, or UNIX timestamp.
 //!
 //! You can get the Rust compiler version either as
-//! [`semver::Version`](https://docs.rs/semver/1/semver/struct.Version.html) or string,
+//! [`semver::Version`](semver::Version) or string,
 //! and the individual version parts as integer literals or strings, respectively.
 //!
 //! # Example
