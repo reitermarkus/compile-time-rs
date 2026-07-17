@@ -1,23 +1,40 @@
-[package]
-name = "compile-time"
+[workspace]
+members = ["macros"]
+
+[workspace.package]
 version = "0.2.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 readme = "ReadMe.md"
-description = "Macros for getting compile time information."
-documentation = "https://docs.rs/compile-time"
 repository = "https://github.com/reitermarkus/compile-time-rs"
 homepage = "https://github.com/reitermarkus/compile-time-rs"
 keywords = ["compilation"]
 categories = ["proc-macro"]
 
-[lib]
-proc-macro = true
+[workspace.dependencies]
+semver = { version = "1" }
+time = { version = "0.3.17" }
+
+[package]
+name = "compile-time"
+description = "Constants and macros for getting compile time information."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+documentation = "https://docs.rs/compile-time"
+repository.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[features]
+default = ["time", "version", "command"]
+time = ["dep:time", "compile-time-macros/time"]
+version = ["dep:semver", "compile-time-macros/version"]
+command = ["compile-time-macros/command"]
 
 [dependencies]
-once_cell = "1"
-proc-macro2 = "1.0"
-quote = "1.0"
-rustc_version = "0.4"
-semver = "1"
-time = { version = "0.3.17", features = ["macros", "formatting"] }
+compile-time-macros = { version = "=0.2.0", path = "./macros" }
+semver = { workspace = true, default-features = false, optional = true }
+time = { workspace = true, default-features = false, features = ["formatting"], optional = true }
