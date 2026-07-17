@@ -456,7 +456,7 @@ pub fn command_str(input: TokenStream) -> TokenStream {
         Ok(string) => string,
         Err(_) => {
           return quote! {
-            compile_error!("Command output is not valid UTF-8.")
+            ::core::compile_error!("Command output is not valid UTF-8.")
           }
           .into()
         },
