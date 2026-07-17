@@ -16,6 +16,7 @@
 //!
 //! println!("Compiled using Rust {rustc_version} on {compile_datetime}.");
 //! ```
+#![no_std]
 
 pub use compile_time_macros::*;
 
