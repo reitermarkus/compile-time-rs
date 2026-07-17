@@ -43,14 +43,14 @@ pub fn output(input: CommandInput) -> Result<Vec<u8>, TokenStream> {
     Ok(output) => output,
     Err(e) => {
       let error_message = format!("Command `{} {}` failed: {}", command, args.join(" "), e);
-      return Err(quote! { ::compile_error!(#error_message) }.into());
+      return Err(quote! { ::core::compile_error!(#error_message) }.into());
     },
   };
 
   if !output.status.success() {
     let stderr = String::from_utf8_lossy(&output.stderr);
     let error_message = format!("Command `{} {}` failed:\n{}", command, args.join(" "), stderr);
-    return Err(quote! { ::compile_error!(#error_message) }.into());
+    return Err(quote! { ::core::compile_error!(#error_message) }.into());
   }
 
   Ok(output.stdout)
