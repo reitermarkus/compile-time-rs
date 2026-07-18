@@ -419,7 +419,7 @@ pub fn rustc_version_build(_item: TokenStream) -> TokenStream {
 /// assert_eq!(MAGIC_NUMBER, b"42\n");
 /// ```
 #[proc_macro]
-#[cfg(feature = "version")]
+#[cfg(feature = "command")]
 pub fn command_bytes(input: TokenStream) -> TokenStream {
   use proc_macro2::Span;
   use syn::{parse_macro_input, LitByteStr};
@@ -448,7 +448,7 @@ pub fn command_bytes(input: TokenStream) -> TokenStream {
 /// assert_eq!(MAGIC_NUMBER, "42\n");
 /// ```
 #[proc_macro]
-#[cfg(feature = "version")]
+#[cfg(feature = "command")]
 pub fn command_str(input: TokenStream) -> TokenStream {
   use proc_macro2::Span;
   use syn::{parse_macro_input, LitStr};
