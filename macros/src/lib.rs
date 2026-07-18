@@ -242,8 +242,8 @@ pub fn unix(_input: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// let rustc_version: semver::Version = compile_time::rustc_version!();
-/// assert_eq!(rustc_version, rustc_version::version().unwrap());
+/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// assert_eq!(RUSTC_VERSION, rustc_version::version().unwrap());
 /// ```
 #[cfg(feature = "version")]
 #[proc_macro]
@@ -317,8 +317,8 @@ pub fn rustc_version_str(_item: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// let rustc_version: semver::Version = compile_time::rustc_version!();
-/// assert_eq!(rustc_version.major, compile_time::rustc_version_major!());
+/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// assert_eq!(RUSTC_VERSION.major, compile_time::rustc_version_major!());
 /// ```
 #[cfg(feature = "version")]
 #[proc_macro]
@@ -336,8 +336,8 @@ pub fn rustc_version_major(_item: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// let rustc_version: semver::Version = compile_time::rustc_version!();
-/// assert_eq!(rustc_version.minor, compile_time::rustc_version_minor!());
+/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// assert_eq!(RUSTC_VERSION.minor, compile_time::rustc_version_minor!());
 /// ```
 #[cfg(feature = "version")]
 #[proc_macro]
@@ -355,8 +355,8 @@ pub fn rustc_version_minor(_item: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// let rustc_version: semver::Version = compile_time::rustc_version!();
-/// assert_eq!(rustc_version.minor, compile_time::rustc_version_minor!());
+/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// assert_eq!(RUSTC_VERSION.minor, compile_time::rustc_version_minor!());
 /// ```
 #[cfg(feature = "version")]
 #[proc_macro]
@@ -374,8 +374,8 @@ pub fn rustc_version_patch(_item: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// let rustc_version: semver::Version = compile_time::rustc_version!();
-/// assert_eq!(rustc_version.pre.as_str(), compile_time::rustc_version_pre!());
+/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// assert_eq!(RUSTC_VERSION.pre.as_str(), compile_time::rustc_version_pre!());
 /// ```
 #[cfg(feature = "version")]
 #[proc_macro]
@@ -388,13 +388,13 @@ pub fn rustc_version_pre(_item: TokenStream) -> TokenStream {
   quote! { #pre }.into()
 }
 
-/// Rust compiler build version as `&'static str`.
+/// Returns the Rust compiler build version as a `&'static str`.
 ///
 /// # Example
 ///
 /// ```
-/// let rustc_version: semver::Version = compile_time::rustc_version!();
-/// assert_eq!(rustc_version.build.as_str(), compile_time::rustc_version_build!());
+/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// assert_eq!(RUSTC_VERSION.build.as_str(), compile_time::rustc_version_build!());
 /// ```
 #[cfg(feature = "version")]
 #[proc_macro]
@@ -407,13 +407,16 @@ pub fn rustc_version_build(_item: TokenStream) -> TokenStream {
   quote! { #build }.into()
 }
 
-/// Rust compiler build version as `&'static str`.
+/// Runs the given command and returns its standard output as a `&'static [u8]`.
+///
+/// Produces a compile error if the command fails or of the output is not valid UTF-8.
 ///
 /// # Example
 ///
 /// ```
-/// let magic_number: &[u8] = compile_time::command_bytes!("echo", "42");
-/// assert_eq!(magic_number, b"42\n");
+/// const MAGIC_NUMBER: &[u8] = compile_time::command_bytes!("echo", "42");
+///
+/// assert_eq!(MAGIC_NUMBER, b"42\n");
 /// ```
 #[proc_macro]
 #[cfg(feature = "version")]
@@ -433,13 +436,16 @@ pub fn command_bytes(input: TokenStream) -> TokenStream {
   }
 }
 
-/// Rust compiler build version as `&'static str`.
+/// Runs the given command and returns its standard output as a `&'static str`.
+///
+/// Produces a compile error if the command fails or of the output is not valid UTF-8.
 ///
 /// # Example
 ///
 /// ```
-/// let magic_number: &str = compile_time::command_str!("echo", "42");
-/// assert_eq!(magic_number, "42\n");
+/// const MAGIC_NUMBER: &str = compile_time::command_str!("echo", "42");
+///
+/// assert_eq!(MAGIC_NUMBER, "42\n");
 /// ```
 #[proc_macro]
 #[cfg(feature = "version")]
