@@ -4,23 +4,23 @@
 
 extern crate proc_macro;
 
-#[cfg(any(feature = "time", feature = "version"))]
-use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote, ToTokens};
-#[cfg(feature = "time")]
-use time::{macros::format_description, OffsetDateTime};
 
 mod command;
-
 #[cfg(feature = "time")]
-static COMPILE_TIME: Lazy<OffsetDateTime> = Lazy::new(OffsetDateTime::now_utc);
+mod datetime;
 #[cfg(feature = "version")]
-static RUSTC_VERSION: Lazy<rustc_version::Result<rustc_version::Version>> = Lazy::new(rustc_version::version);
+mod version;
 
-/// Compile date as `time::Date`.
+/// Returns the compile date as [`time::Date`].
+///
+/// By default, the returned date is in UTC, call `date!(local)`
+/// to return the local date.
 ///
 /// # Example
+///
+/// Get the UTC date:
 ///
 /// ```
 /// const COMPILE_DATE: time::Date = compile_time::date!();
@@ -30,10 +30,31 @@ static RUSTC_VERSION: Lazy<rustc_version::Result<rustc_version::Version>> = Lazy
 /// let day = COMPILE_DATE.day();
 /// println!("Compiled on {month} {day}, {year}.");
 /// ```
+///
+/// Get the date for the local time zone:
+///
+/// ```
+/// const COMPILE_DATE: time::Date = compile_time::date!(local);
+///
+/// let year = COMPILE_DATE.year();
+/// let month = COMPILE_DATE.month();
+/// let day = COMPILE_DATE.day();
+/// println!("Compiled on {month} {day}, {year}.");
+/// ```
 #[cfg(feature = "time")]
 #[proc_macro]
-pub fn date(_input: TokenStream) -> TokenStream {
-  let date = COMPILE_TIME.date();
+pub fn date(input: TokenStream) -> TokenStream {
+  use syn::parse_macro_input;
+
+  use datetime::TimeInput;
+
+  let input = parse_macro_input!(input as TimeInput);
+  let now = match input.now() {
+    Ok(now) => now,
+    Err(err) => return err.into_compile_error().into(),
+  };
+
+  let date = now.date();
 
   let year = date.year();
   let month = format_ident!("{}", format!("{:?}", date.month()));
@@ -51,9 +72,14 @@ pub fn date(_input: TokenStream) -> TokenStream {
   .into()
 }
 
-/// Compile date as `&'static str` in `yyyy-MM-dd` format.
+/// Returns the compile date as `&'static str` in `yyyy-MM-dd` format.
+///
+/// By default, the returned date is in UTC, call `date_str!(local)`
+/// to return the local date.
 ///
 /// # Example
+///
+/// Get the UTC date:
 ///
 /// ```
 /// const COMPILE_DATE: time::Date = compile_time::date!();
@@ -65,10 +91,34 @@ pub fn date(_input: TokenStream) -> TokenStream {
 ///
 /// assert_eq!(compile_time::date_str!(), date_string);
 /// ```
+///
+/// Get the date for the local time zone:
+///
+/// ```
+/// const COMPILE_DATE: time::Date = compile_time::date!(local);
+///
+/// let year = COMPILE_DATE.year();
+/// let month: u8 = COMPILE_DATE.month().into();
+/// let day = COMPILE_DATE.day();
+/// let date_string = format!("{year:04}-{month:02}-{day:02}");
+///
+/// assert_eq!(compile_time::date_str!(local), date_string);
+/// ```
 #[cfg(feature = "time")]
 #[proc_macro]
-pub fn date_str(_input: TokenStream) -> TokenStream {
-  let date = COMPILE_TIME.date();
+pub fn date_str(input: TokenStream) -> TokenStream {
+  use syn::parse_macro_input;
+  use time::macros::format_description;
+
+  use datetime::TimeInput;
+
+  let input = parse_macro_input!(input as TimeInput);
+  let now = match input.now() {
+    Ok(now) => now,
+    Err(err) => return err.into_compile_error().into(),
+  };
+
+  let date = now.date();
 
   let fmt = format_description!("[year]-[month]-[day]");
   let date_str = date.format(&fmt).unwrap();
@@ -76,9 +126,14 @@ pub fn date_str(_input: TokenStream) -> TokenStream {
   quote! { #date_str }.into()
 }
 
-/// Compile time as `time::Time`.
+/// Returns the compile time as [`time::Time`].
+///
+/// By default, the returned time is in UTC, call `time!(local)`
+/// to return the local time.
 ///
 /// # Example
+///
+/// Get the UTC time:
 ///
 /// ```
 /// const COMPILE_TIME: time::Time = compile_time::time!();
@@ -88,10 +143,31 @@ pub fn date_str(_input: TokenStream) -> TokenStream {
 /// let second = COMPILE_TIME.second();
 /// println!("Compiled at {hour:02}:{minute:02}:{second:02}.");
 /// ```
+///
+/// Get the time for the local time zone:
+///
+/// ```
+/// const COMPILE_TIME: time::Time = compile_time::time!(local);
+///
+/// let hour = COMPILE_TIME.hour();
+/// let minute = COMPILE_TIME.minute();
+/// let second = COMPILE_TIME.second();
+/// println!("Compiled at {hour:02}:{minute:02}:{second:02}.");
+/// ```
 #[cfg(feature = "time")]
 #[proc_macro]
-pub fn time(_input: TokenStream) -> TokenStream {
-  let time = COMPILE_TIME.time();
+pub fn time(input: TokenStream) -> TokenStream {
+  use syn::parse_macro_input;
+
+  use datetime::TimeInput;
+
+  let input = parse_macro_input!(input as TimeInput);
+  let now = match input.now() {
+    Ok(now) => now,
+    Err(err) => return err.into_compile_error().into(),
+  };
+
+  let time = now.time();
 
   let hour = time.hour();
   let minute = time.minute();
@@ -109,9 +185,14 @@ pub fn time(_input: TokenStream) -> TokenStream {
   .into()
 }
 
-/// Compile time as `&'static str` in `hh:mm:ss` format.
+/// Returns the compile time as `&'static str` in `hh:mm:ss` format.
+///
+/// By default, the returned time is in UTC, call `time_str!(local)`
+/// to return the local time.
 ///
 /// # Example
+///
+/// Get the UTC time:
 ///
 /// ```
 /// const COMPILE_TIME: time::Time = compile_time::time!();
@@ -123,10 +204,34 @@ pub fn time(_input: TokenStream) -> TokenStream {
 ///
 /// assert_eq!(compile_time::time_str!(), time_string);
 /// ```
+///
+/// Get the time for the local time zone:
+///
+/// ```
+/// const COMPILE_TIME: time::Time = compile_time::time!(local);
+///
+/// let hour = COMPILE_TIME.hour();
+/// let minute = COMPILE_TIME.minute();
+/// let second = COMPILE_TIME.second();
+/// let time_string = format!("{hour:02}:{minute:02}:{second:02}");
+///
+/// assert_eq!(compile_time::time_str!(local), time_string);
+/// ```
 #[cfg(feature = "time")]
 #[proc_macro]
-pub fn time_str(_input: TokenStream) -> TokenStream {
-  let time = COMPILE_TIME.time();
+pub fn time_str(input: TokenStream) -> TokenStream {
+  use syn::parse_macro_input;
+  use time::macros::format_description;
+
+  use datetime::TimeInput;
+
+  let input = parse_macro_input!(input as TimeInput);
+  let now = match input.now() {
+    Ok(now) => now,
+    Err(err) => return err.into_compile_error().into(),
+  };
+
+  let time = now.time();
 
   let fmt = format_description!("[hour]:[minute]:[second]");
   let time_str = time.format(&fmt).unwrap();
@@ -134,9 +239,14 @@ pub fn time_str(_input: TokenStream) -> TokenStream {
   quote! { #time_str }.into()
 }
 
-/// Compile date and time as `time::OffsetDateTime`.
+/// Returns the compile date and time as [`time::OffsetDateTime`].
+///
+/// By default, the returned datetime is in UTC, call `datetime!(local)`
+/// to return the local date and time.
 ///
 /// # Example
+///
+/// Get the UTC date and time:
 ///
 /// ```
 /// const COMPILE_DATETIME: time::OffsetDateTime = compile_time::datetime!();
@@ -159,10 +269,34 @@ pub fn time_str(_input: TokenStream) -> TokenStream {
 /// # assert!(COMPILE_DATETIME > yesterday);
 /// # assert!(COMPILE_DATETIME < now);
 /// ```
+///
+/// Get the date and time for the local time zone:
+///
+/// ```
+/// const COMPILE_DATETIME: time::OffsetDateTime = compile_time::datetime!(local);
+///
+/// let year = COMPILE_DATETIME.year();
+/// let month = COMPILE_DATETIME.month();
+/// let day = COMPILE_DATETIME.day();
+/// let hour = COMPILE_DATETIME.hour();
+/// let minute = COMPILE_DATETIME.minute();
+/// let second = COMPILE_DATETIME.second();
+/// println!("Compiled at {hour:02}:{minute:02}:{second:02} on {month} {day}, {year}.");
+/// ```
 #[cfg(feature = "time")]
 #[proc_macro]
-pub fn datetime(_input: TokenStream) -> TokenStream {
-  let datetime = *COMPILE_TIME;
+pub fn datetime(input: TokenStream) -> TokenStream {
+  use syn::parse_macro_input;
+
+  use datetime::TimeInput;
+
+  let input = parse_macro_input!(input as TimeInput);
+  let now = match input.now() {
+    Ok(now) => now,
+    Err(err) => return err.into_compile_error().into(),
+  };
+
+  let datetime = now;
 
   let year = datetime.year();
   let month = format_ident!("{}", format!("{:?}", datetime.month()));
@@ -193,9 +327,14 @@ pub fn datetime(_input: TokenStream) -> TokenStream {
   .into()
 }
 
-/// Compile time as `&'static str` in `yyyy-MM-ddThh:mm:ssZ` format.
+/// Returns the compile date and time as `&'static str` in `yyyy-MM-ddThh:mm:ssZ` format.
+///
+/// By default, the returned datetime is in UTC, call `datetime_str!(local)`
+/// to return the local date and time.
 ///
 /// # Example
+///
+/// Get the UTC date and time:
 ///
 /// ```
 /// const COMPILE_DATE_STRING: &str = compile_time::date_str!();
@@ -204,10 +343,31 @@ pub fn datetime(_input: TokenStream) -> TokenStream {
 /// let datetime_string = format!("{COMPILE_DATE_STRING}T{COMPILE_TIME_STRING}Z");
 /// assert_eq!(compile_time::datetime_str!(), datetime_string);
 /// ```
+///
+/// Get the date and time for the local time zone:
+///
+/// ```
+/// const COMPILE_DATE_STRING: &str = compile_time::date_str!(local);
+/// const COMPILE_TIME_STRING: &str = compile_time::time_str!(local);
+///
+/// let datetime_string = format!("{COMPILE_DATE_STRING}T{COMPILE_TIME_STRING}Z");
+/// assert_eq!(compile_time::datetime_str!(local), datetime_string);
+/// ```
 #[cfg(feature = "time")]
 #[proc_macro]
-pub fn datetime_str(_input: TokenStream) -> TokenStream {
-  let datetime = *COMPILE_TIME;
+pub fn datetime_str(input: TokenStream) -> TokenStream {
+  use syn::parse_macro_input;
+  use time::macros::format_description;
+
+  use datetime::TimeInput;
+
+  let input = parse_macro_input!(input as TimeInput);
+  let now = match input.now() {
+    Ok(now) => now,
+    Err(err) => return err.into_compile_error().into(),
+  };
+
+  let datetime = now;
 
   let fmt = format_description!("[year]-[month]-[day]T[hour]:[minute]:[second]Z");
   let datetime_str = datetime.format(&fmt).unwrap();
@@ -215,7 +375,7 @@ pub fn datetime_str(_input: TokenStream) -> TokenStream {
   quote! { #datetime_str }.into()
 }
 
-/// Compile date and time as UNIX timestamp in seconds.
+/// Returns the compile date and time as UNIX timestamp in seconds.
 ///
 /// # Example
 ///
@@ -227,7 +387,7 @@ pub fn datetime_str(_input: TokenStream) -> TokenStream {
 #[cfg(feature = "time")]
 #[proc_macro]
 pub fn unix(_input: TokenStream) -> TokenStream {
-  let datetime = *COMPILE_TIME;
+  let datetime = datetime::utc();
 
   let unix_timestamp = proc_macro2::Literal::i64_unsuffixed(datetime.unix_timestamp());
 
@@ -237,7 +397,7 @@ pub fn unix(_input: TokenStream) -> TokenStream {
   .into()
 }
 
-/// Rust compiler version as `semver::Version`.
+/// Returns the Rust compiler version as [`semver::Version`].
 ///
 /// # Example
 ///
@@ -248,51 +408,51 @@ pub fn unix(_input: TokenStream) -> TokenStream {
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version(_item: TokenStream) -> TokenStream {
-  let rustc_version::Version { major, minor, patch, pre, build } = match &*RUSTC_VERSION {
-    Ok(rustc_version) => rustc_version,
-    Err(err) => panic!("Failed to get version: {}", err),
-  };
-
-  let semver_prefix = quote! { ::compile_time::__re_exports::semver };
-  let pre = if pre.is_empty() {
-    quote! { #semver_prefix::Prerelease::EMPTY }
-  } else {
-    let pre = pre.as_str();
-    quote! {
-      if let Ok(pre) = #semver_prefix::Prerelease::new(#pre) {
-        pre
+  match version::rustc() {
+    Ok(rustc_version::Version { major, minor, patch, pre, build }) => {
+      let semver_prefix = quote! { ::compile_time::__re_exports::semver };
+      let pre = if pre.is_empty() {
+        quote! { #semver_prefix::Prerelease::EMPTY }
       } else {
-        ::core::unreachable!()
-      }
-    }
-  };
+        let pre = pre.as_str();
+        quote! {
+          if let Ok(pre) = #semver_prefix::Prerelease::new(#pre) {
+            pre
+          } else {
+            ::core::unreachable!()
+          }
+        }
+      };
 
-  let build = if build.is_empty() {
-    quote! { #semver_prefix::BuildMetadata::EMPTY }
-  } else {
-    let build = build.as_str();
-    quote! {
-      if let Ok(build) = #semver_prefix::BuildMetadata::new(#build) {
-        build
+      let build = if build.is_empty() {
+        quote! { #semver_prefix::BuildMetadata::EMPTY }
       } else {
-        ::core::unreachable!()
-      }
-    }
-  };
+        let build = build.as_str();
+        quote! {
+          if let Ok(build) = #semver_prefix::BuildMetadata::new(#build) {
+            build
+          } else {
+            ::core::unreachable!()
+          }
+        }
+      };
 
-  quote! {
-    #semver_prefix::Version {
-      major: #major,
-      minor: #minor,
-      patch: #patch,
-      pre: #pre,
-      build: #build,
-    }
+      quote! {
+        #semver_prefix::Version {
+          major: #major,
+          minor: #minor,
+          patch: #patch,
+          pre: #pre,
+          build: #build,
+        }
+      }
+    },
+    Err(err) => err.into_compile_error(),
   }
   .into()
 }
 
-/// Rust compiler version as `&'static str`.
+/// Returns the Rust compiler version as `&'static str`.
 ///
 /// # Example
 ///
@@ -303,16 +463,17 @@ pub fn rustc_version(_item: TokenStream) -> TokenStream {
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version_str(_item: TokenStream) -> TokenStream {
-  let rustc_version = match &*RUSTC_VERSION {
-    Ok(rustc_version) => rustc_version,
-    Err(err) => panic!("Failed to get version: {}", err),
-  };
-
-  let rustc_version_string = rustc_version.to_string();
-  quote! { #rustc_version_string }.into()
+  match version::rustc() {
+    Ok(rustc_version) => {
+      let rustc_version_string = rustc_version.to_string();
+      quote! { #rustc_version_string }
+    },
+    Err(err) => err.into_compile_error(),
+  }
+  .into()
 }
 
-/// Rust compiler major version as integer literal.
+/// Returns the Rust compiler major version as integer literal.
 ///
 /// # Example
 ///
@@ -323,15 +484,17 @@ pub fn rustc_version_str(_item: TokenStream) -> TokenStream {
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version_major(_item: TokenStream) -> TokenStream {
-  let major = match &*RUSTC_VERSION {
-    Ok(rustc_version) => rustc_version.major,
-    Err(err) => panic!("Failed to get version: {}", err),
-  };
-
-  proc_macro2::Literal::u64_unsuffixed(major).to_token_stream().into()
+  match version::rustc() {
+    Ok(rustc_version) => {
+      let major = rustc_version.major;
+      proc_macro2::Literal::u64_unsuffixed(major).to_token_stream()
+    },
+    Err(err) => err.into_compile_error(),
+  }
+  .into()
 }
 
-/// Rust compiler minor version as integer literal.
+/// Returns the Rust compiler minor version as integer literal.
 ///
 /// # Example
 ///
@@ -342,15 +505,17 @@ pub fn rustc_version_major(_item: TokenStream) -> TokenStream {
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version_minor(_item: TokenStream) -> TokenStream {
-  let minor = match &*RUSTC_VERSION {
-    Ok(rustc_version) => rustc_version.minor,
-    Err(err) => panic!("Failed to get version: {}", err),
-  };
-
-  proc_macro2::Literal::u64_unsuffixed(minor).to_token_stream().into()
+  match version::rustc() {
+    Ok(rustc_version) => {
+      let minor = rustc_version.minor;
+      proc_macro2::Literal::u64_unsuffixed(minor).to_token_stream()
+    },
+    Err(err) => err.into_compile_error(),
+  }
+  .into()
 }
 
-/// Rust compiler patch version as integer literal.
+/// Returns the Rust compiler patch version as integer literal.
 ///
 /// # Example
 ///
@@ -361,15 +526,17 @@ pub fn rustc_version_minor(_item: TokenStream) -> TokenStream {
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version_patch(_item: TokenStream) -> TokenStream {
-  let patch = match &*RUSTC_VERSION {
-    Ok(rustc_version) => rustc_version.patch,
-    Err(err) => panic!("Failed to get version: {}", err),
-  };
-
-  proc_macro2::Literal::u64_unsuffixed(patch).to_token_stream().into()
+  match version::rustc() {
+    Ok(rustc_version) => {
+      let patch = rustc_version.patch;
+      proc_macro2::Literal::u64_unsuffixed(patch).to_token_stream()
+    },
+    Err(err) => err.into_compile_error(),
+  }
+  .into()
 }
 
-/// Rust compiler pre version as `&'static str`.
+/// Returns the Rust compiler pre version as `&'static str`.
 ///
 /// # Example
 ///
@@ -380,12 +547,14 @@ pub fn rustc_version_patch(_item: TokenStream) -> TokenStream {
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version_pre(_item: TokenStream) -> TokenStream {
-  let pre = match &*RUSTC_VERSION {
-    Ok(rustc_version) => rustc_version.pre.as_str(),
-    Err(err) => panic!("Failed to get version: {}", err),
-  };
-
-  quote! { #pre }.into()
+  match version::rustc() {
+    Ok(rustc_version) => {
+      let pre = rustc_version.pre.as_str();
+      quote! { #pre }
+    },
+    Err(err) => err.into_compile_error(),
+  }
+  .into()
 }
 
 /// Returns the Rust compiler build version as a `&'static str`.
@@ -398,13 +567,15 @@ pub fn rustc_version_pre(_item: TokenStream) -> TokenStream {
 /// ```
 #[cfg(feature = "version")]
 #[proc_macro]
-pub fn rustc_version_build(_item: TokenStream) -> TokenStream {
-  let build = match &*RUSTC_VERSION {
-    Ok(rustc_version) => rustc_version.build.as_str(),
-    Err(err) => panic!("Failed to get version: {}", err),
-  };
-
-  quote! { #build }.into()
+pub fn rustc_version_build(_input: TokenStream) -> TokenStream {
+  match version::rustc() {
+    Ok(rustc_version) => {
+      let build = rustc_version.build.as_str();
+      quote! { #build }
+    },
+    Err(err) => err.into_compile_error(),
+  }
+  .into()
 }
 
 /// Runs the given command and returns its standard output as a `&'static [u8]`.
