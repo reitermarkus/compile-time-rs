@@ -8,8 +8,8 @@ license = "MIT OR Apache-2.0"
 readme = "ReadMe.md"
 repository = "https://github.com/reitermarkus/compile-time-rs"
 homepage = "https://github.com/reitermarkus/compile-time-rs"
-keywords = ["compilation"]
-categories = ["proc-macro"]
+keywords = ["compilation", "proc-macro"]
+categories = ["development-tools", "date-and-time", "no-std"]
 
 [workspace.dependencies]
 semver = { version = "1" }
