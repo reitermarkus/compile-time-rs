@@ -2,3 +2,10 @@
 changelog_update = false
 git_release_name = "v{{ version }}"
 git_tag_name = "v{{ version }}"
+
+# Avoid pushing the same tag twice, since the tag/release
+# is shared between main and proc-macro crate,
+[[package]]
+name = "compile-time-macros"
+git_release_enable = false
+git_tag_enable = false
