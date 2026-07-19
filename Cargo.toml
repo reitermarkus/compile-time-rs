@@ -2,7 +2,7 @@
 members = ["macros"]
 
 [workspace.package]
-version = "0.3.4"
+version = "0.3.5"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 readme = "ReadMe.md"
@@ -35,6 +35,6 @@ version = ["dep:semver", "compile-time-macros/version"]
 command = ["compile-time-macros/command"]
 
 [dependencies]
-compile-time-macros = { version = "=0.3.4", path = "./macros" }
+compile-time-macros = { version = "=0.3.5", path = "./macros" }
 semver = { workspace = true, optional = true }
 time03 = { workspace = true, features = ["formatting"], optional = true }
