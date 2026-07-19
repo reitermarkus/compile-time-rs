@@ -1,9 +1,9 @@
 use once_cell::sync::Lazy;
 use proc_macro2::Span;
 use syn::{parse::Parse, Ident, Token};
-use time::{OffsetDateTime, UtcOffset};
+use time03::{OffsetDateTime, UtcOffset};
 
-pub static COMPILE_TIME: Lazy<OffsetDateTime> = Lazy::new(OffsetDateTime::now_utc);
+static COMPILE_TIME: Lazy<OffsetDateTime> = Lazy::new(OffsetDateTime::now_utc);
 
 pub fn utc() -> OffsetDateTime {
   *COMPILE_TIME
