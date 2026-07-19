@@ -7,13 +7,14 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote, ToTokens};
 
+#[cfg(feature = "command")]
 mod command;
 #[cfg(feature = "time")]
-mod datetime;
+mod time;
 #[cfg(feature = "version")]
 mod version;
 
-/// Returns the compile date as [`time::Date`].
+/// Returns the compile date as [`time::Date`](time03::Date).
 ///
 /// By default, the returned date is in UTC, call `date!(local)`
 /// to return the local date.
@@ -23,6 +24,7 @@ mod version;
 /// Get the UTC date:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_DATE: time::Date = compile_time::date!();
 ///
 /// let year = COMPILE_DATE.year();
@@ -34,6 +36,7 @@ mod version;
 /// Get the date for the local time zone:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_DATE: time::Date = compile_time::date!(local);
 ///
 /// let year = COMPILE_DATE.year();
@@ -46,7 +49,7 @@ mod version;
 pub fn date(input: TokenStream) -> TokenStream {
   use syn::parse_macro_input;
 
-  use datetime::TimeInput;
+  use time::TimeInput;
 
   let input = parse_macro_input!(input as TimeInput);
   let now = match input.now() {
@@ -82,6 +85,7 @@ pub fn date(input: TokenStream) -> TokenStream {
 /// Get the UTC date:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_DATE: time::Date = compile_time::date!();
 ///
 /// let year = COMPILE_DATE.year();
@@ -95,6 +99,7 @@ pub fn date(input: TokenStream) -> TokenStream {
 /// Get the date for the local time zone:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_DATE: time::Date = compile_time::date!(local);
 ///
 /// let year = COMPILE_DATE.year();
@@ -108,9 +113,9 @@ pub fn date(input: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn date_str(input: TokenStream) -> TokenStream {
   use syn::parse_macro_input;
-  use time::macros::format_description;
+  use time03::format_description;
 
-  use datetime::TimeInput;
+  use time::TimeInput;
 
   let input = parse_macro_input!(input as TimeInput);
   let now = match input.now() {
@@ -120,13 +125,13 @@ pub fn date_str(input: TokenStream) -> TokenStream {
 
   let date = now.date();
 
-  let fmt = format_description!("[year]-[month]-[day]");
+  let fmt = format_description::parse_borrowed::<3>("[year]-[month]-[day]").unwrap();
   let date_str = date.format(&fmt).unwrap();
 
   quote! { #date_str }.into()
 }
 
-/// Returns the compile time as [`time::Time`].
+/// Returns the compile time as [`time::Time`](time03::Time).
 ///
 /// By default, the returned time is in UTC, call `time!(local)`
 /// to return the local time.
@@ -136,6 +141,7 @@ pub fn date_str(input: TokenStream) -> TokenStream {
 /// Get the UTC time:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_TIME: time::Time = compile_time::time!();
 ///
 /// let hour = COMPILE_TIME.hour();
@@ -147,6 +153,7 @@ pub fn date_str(input: TokenStream) -> TokenStream {
 /// Get the time for the local time zone:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_TIME: time::Time = compile_time::time!(local);
 ///
 /// let hour = COMPILE_TIME.hour();
@@ -159,7 +166,7 @@ pub fn date_str(input: TokenStream) -> TokenStream {
 pub fn time(input: TokenStream) -> TokenStream {
   use syn::parse_macro_input;
 
-  use datetime::TimeInput;
+  use time::TimeInput;
 
   let input = parse_macro_input!(input as TimeInput);
   let now = match input.now() {
@@ -195,6 +202,7 @@ pub fn time(input: TokenStream) -> TokenStream {
 /// Get the UTC time:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_TIME: time::Time = compile_time::time!();
 ///
 /// let hour = COMPILE_TIME.hour();
@@ -208,6 +216,7 @@ pub fn time(input: TokenStream) -> TokenStream {
 /// Get the time for the local time zone:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_TIME: time::Time = compile_time::time!(local);
 ///
 /// let hour = COMPILE_TIME.hour();
@@ -221,9 +230,9 @@ pub fn time(input: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn time_str(input: TokenStream) -> TokenStream {
   use syn::parse_macro_input;
-  use time::macros::format_description;
+  use time03::format_description;
 
-  use datetime::TimeInput;
+  use time::TimeInput;
 
   let input = parse_macro_input!(input as TimeInput);
   let now = match input.now() {
@@ -233,13 +242,13 @@ pub fn time_str(input: TokenStream) -> TokenStream {
 
   let time = now.time();
 
-  let fmt = format_description!("[hour]:[minute]:[second]");
+  let fmt = format_description::parse_borrowed::<3>("[hour]:[minute]:[second]").unwrap();
   let time_str = time.format(&fmt).unwrap();
 
   quote! { #time_str }.into()
 }
 
-/// Returns the compile date and time as [`time::OffsetDateTime`].
+/// Returns the compile date and time as [`time::OffsetDateTime`](time03::OffsetDateTime).
 ///
 /// By default, the returned datetime is in UTC, call `datetime!(local)`
 /// to return the local date and time.
@@ -249,6 +258,7 @@ pub fn time_str(input: TokenStream) -> TokenStream {
 /// Get the UTC date and time:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_DATETIME: time::OffsetDateTime = compile_time::datetime!();
 ///
 /// let year = COMPILE_DATETIME.year();
@@ -273,6 +283,7 @@ pub fn time_str(input: TokenStream) -> TokenStream {
 /// Get the date and time for the local time zone:
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_DATETIME: time::OffsetDateTime = compile_time::datetime!(local);
 ///
 /// let year = COMPILE_DATETIME.year();
@@ -288,7 +299,7 @@ pub fn time_str(input: TokenStream) -> TokenStream {
 pub fn datetime(input: TokenStream) -> TokenStream {
   use syn::parse_macro_input;
 
-  use datetime::TimeInput;
+  use time::TimeInput;
 
   let input = parse_macro_input!(input as TimeInput);
   let now = match input.now() {
@@ -357,9 +368,9 @@ pub fn datetime(input: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn datetime_str(input: TokenStream) -> TokenStream {
   use syn::parse_macro_input;
-  use time::macros::format_description;
+  use time03::format_description;
 
-  use datetime::TimeInput;
+  use time::TimeInput;
 
   let input = parse_macro_input!(input as TimeInput);
   let now = match input.now() {
@@ -369,7 +380,7 @@ pub fn datetime_str(input: TokenStream) -> TokenStream {
 
   let datetime = now;
 
-  let fmt = format_description!("[year]-[month]-[day]T[hour]:[minute]:[second]Z");
+  let fmt = format_description::parse_borrowed::<3>("[year]-[month]-[day]T[hour]:[minute]:[second]Z").unwrap();
   let datetime_str = datetime.format(&fmt).unwrap();
 
   quote! { #datetime_str }.into()
@@ -380,6 +391,7 @@ pub fn datetime_str(input: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
+/// # use time03 as time;
 /// const COMPILE_DATETIME: time::OffsetDateTime = compile_time::datetime!();
 ///
 /// assert_eq!(compile_time::unix!(), COMPILE_DATETIME.unix_timestamp());
@@ -387,7 +399,7 @@ pub fn datetime_str(input: TokenStream) -> TokenStream {
 #[cfg(feature = "time")]
 #[proc_macro]
 pub fn unix(_input: TokenStream) -> TokenStream {
-  let datetime = datetime::utc();
+  let datetime = time::utc();
 
   let unix_timestamp = proc_macro2::Literal::i64_unsuffixed(datetime.unix_timestamp());
 
@@ -601,10 +613,11 @@ pub fn command_bytes(input: TokenStream) -> TokenStream {
   match command::output(input) {
     Ok(output) => {
       let output = LitByteStr::new(&output, Span::call_site());
-      quote! { #output }.into()
+      quote! { #output }
     },
-    Err(e) => e,
+    Err(err) => err.into_compile_error(),
   }
+  .into()
 }
 
 /// Runs the given command and returns its standard output as a `&'static str`.
@@ -628,20 +641,16 @@ pub fn command_str(input: TokenStream) -> TokenStream {
 
   let input = parse_macro_input!(input as CommandInput);
   match command::output(input) {
-    Ok(output) => {
-      let output_string = match String::from_utf8(output) {
-        Ok(string) => string,
-        Err(_) => {
-          return quote! {
-            ::core::compile_error!("Command output is not valid UTF-8.")
-          }
-          .into()
-        },
-      };
-
-      let output = LitStr::new(&output_string, Span::call_site());
-      quote! { #output }.into()
+    Ok(output) => match String::from_utf8(output) {
+      Ok(output_string) => {
+        let output = LitStr::new(&output_string, Span::call_site());
+        quote! { #output }
+      },
+      Err(_) => quote! {
+        ::core::compile_error!("Command output is not valid UTF-8.")
+      },
     },
-    Err(e) => e,
+    Err(err) => err.into_compile_error(),
   }
+  .into()
 }

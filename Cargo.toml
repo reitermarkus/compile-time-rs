@@ -12,8 +12,8 @@ keywords = ["compilation", "proc-macro"]
 categories = ["development-tools", "date-and-time", "no-std"]
 
 [workspace.dependencies]
-semver = { version = "1" }
-time = { version = "0.3.17" }
+semver = { version = "1", default-features = false }
+time03 = { package = "time", version = "0.3.48", default-features = false }
 
 [package]
 name = "compile-time"
@@ -30,11 +30,11 @@ categories.workspace = true
 
 [features]
 default = ["time", "version", "command"]
-time = ["dep:time", "compile-time-macros/time"]
+time = ["dep:time03", "compile-time-macros/time"]
 version = ["dep:semver", "compile-time-macros/version"]
 command = ["compile-time-macros/command"]
 
 [dependencies]
 compile-time-macros = { version = "=0.3.4", path = "./macros" }
-semver = { workspace = true, default-features = false, optional = true }
-time = { workspace = true, default-features = false, features = ["formatting"], optional = true }
+semver = { workspace = true, optional = true }
+time03 = { workspace = true, features = ["formatting"], optional = true }

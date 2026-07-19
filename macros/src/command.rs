@@ -1,8 +1,7 @@
 use std::process::Command;
 
 use macro_string::MacroString;
-use proc_macro::TokenStream;
-use quote::quote;
+use proc_macro2::Span;
 use syn::{parse::Parse, Token};
 
 pub struct CommandInput {
@@ -33,7 +32,7 @@ impl Parse for CommandInput {
   }
 }
 
-pub fn output(input: CommandInput) -> Result<Vec<u8>, TokenStream> {
+pub fn output(input: CommandInput) -> Result<Vec<u8>, syn::Error> {
   let CommandInput { command, args } = input;
 
   let mut cmd = Command::new(&command);
@@ -42,15 +41,17 @@ pub fn output(input: CommandInput) -> Result<Vec<u8>, TokenStream> {
   let output = match cmd.output() {
     Ok(output) => output,
     Err(e) => {
-      let error_message = format!("Command `{} {}` failed: {}", command, args.join(" "), e);
-      return Err(quote! { ::core::compile_error!(#error_message) }.into());
+      return Err(syn::Error::new(Span::call_site(), format!("Command `{} {}` failed: {}", command, args.join(" "), e)));
     },
   };
 
   if !output.status.success() {
     let stderr = String::from_utf8_lossy(&output.stderr);
-    let error_message = format!("Command `{} {}` failed:\n{}", command, args.join(" "), stderr);
-    return Err(quote! { ::core::compile_error!(#error_message) }.into());
+
+    return Err(syn::Error::new(
+      Span::call_site(),
+      format!("Command `{} {}` failed:\n{}", command, args.join(" "), stderr),
+    ));
   }
 
   Ok(output.stdout)

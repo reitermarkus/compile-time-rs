@@ -1,8 +1,8 @@
 //! This crate provides macros for getting compile time information.
 //!
 //! You can get the compile time either as
-//! [`time::Date`], [`time::Time`],
-//! [`time::OffsetDateTime`], string, or UNIX timestamp.
+//! [`time::Date`](time03::Date), [`time::Time`](time03::Time),
+//! [`time::OffsetDateTime`](time03::OffsetDateTime), string, or UNIX timestamp.
 //!
 //! You can get the Rust compiler version either as
 //! [`semver::Version`] or string,
@@ -31,5 +31,5 @@ pub mod __re_exports {
   #[cfg(feature = "version")]
   pub use semver;
   #[cfg(feature = "time")]
-  pub use time;
+  pub use time03 as time;
 }
