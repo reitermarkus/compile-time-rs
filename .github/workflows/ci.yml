@@ -4,6 +4,6 @@ name: CI
 
 jobs:
   ci:
-    uses: reitermarkus/.github/.github/workflows/cargo-build-publish.yml@db907bc706dc3f7a00cfae6b3d09ba54049bee51 # main
+    uses: reitermarkus/.github/.github/workflows/cargo-build-publish.yml@8e176ee13ad974e2f0f34e89669fca121e8350e3 # main
     with:
       publish: false
