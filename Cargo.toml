@@ -28,6 +28,14 @@ homepage.workspace = true
 keywords.workspace = true
 categories.workspace = true
 
+[package.metadata]
+feature-matrix = [
+  ["default"],
+  ["command"],
+  ["time"],
+  ["version"],
+]
+
 [features]
 default = ["time", "version", "command"]
 time = ["dep:time03", "compile-time-macros/time"]
