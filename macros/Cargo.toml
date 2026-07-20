@@ -16,12 +16,11 @@ proc-macro = true
 
 [features]
 default = ["time", "version", "command"]
-time = ["dep:time03", "dep:once_cell"]
-version = ["dep:rustc_version", "dep:semver", "dep:once_cell"]
+time = ["dep:time03"]
+version = ["dep:rustc_version", "dep:semver"]
 command = ["dep:macro-string"]
 
 [dependencies]
-once_cell = { version = "1", optional = true }
 proc-macro2 = "1.0"
 syn = "3"
 quote = "1.0"
