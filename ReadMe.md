@@ -11,11 +11,23 @@ You can get the compile time either as `time::Date`, `time::Time`,
 You can get the Rust compiler version either as `semver::Version` or string,
 and the individual version parts as integer literals or strings, respectively.
 
-# Example
+You can run arbitrary command at compile time and get its output as bytes or string.
+
+# Examples
+
+Getting the compile time and Rust version:
 
 ```rust
-let compile_datetime = compile_time::datetime_str!();
-let rustc_version = compile_time::rustc_version_str!();
+const COMPILE_DATETIME: &str = compile_time::datetime_str!();
+const RUSTC_VERSION: &str = compile_time::rustc_version_str!();
 
-println!("Compiled using Rust {rustc_version} on {compile_datetime}.");
+println!("Compiled using Rust {RUSTC_VERSION} on {COMPILE_DATETIME}.");
+```
+
+Running an arbitrary command at compile time:
+
+```rust
+const MAGIC_NUMBER: &[u8] = compile_time::command_bytes!("echo", "42");
+
+assert_eq!(MAGIC_NUMBER, b"42\n");
 ```
