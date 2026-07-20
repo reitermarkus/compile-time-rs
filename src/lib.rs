@@ -8,13 +8,25 @@
 //! [`semver::Version`] or string,
 //! and the individual version parts as integer literals or strings, respectively.
 //!
-//! # Example
+//! You can run arbitrary command at compile time and get its output as bytes or string.
 //!
+//! # Examples
+//!
+//! Getting the compile time and Rust version:
+//!
+//! ```rust
+//! const COMPILE_DATETIME: &str = compile_time::datetime_str!();
+//! const RUSTC_VERSION: &str = compile_time::rustc_version_str!();
+//!
+//! println!("Compiled using Rust {RUSTC_VERSION} on {COMPILE_DATETIME}.");
 //! ```
-//! let compile_datetime = compile_time::datetime_str!();
-//! let rustc_version = compile_time::rustc_version_str!();
 //!
-//! println!("Compiled using Rust {rustc_version} on {compile_datetime}.");
+//! Running an arbitrary command at compile time:
+//!
+//! ```rust
+//! const MAGIC_NUMBER: &[u8] = compile_time::command_bytes!("echo", "42");
+//!
+//! assert_eq!(MAGIC_NUMBER, b"42\n");
 //! ```
 #![no_std]
 
@@ -33,3 +45,7 @@ pub mod __re_exports {
   #[cfg(feature = "time")]
   pub use time03 as time;
 }
+
+#[doc = include_str!("../ReadMe.md")]
+#[doc(hidden)]
+pub fn __readme_doc_test() {}
