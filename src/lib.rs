@@ -24,9 +24,9 @@
 //! Running an arbitrary command at compile time:
 //!
 //! ```rust
-//! const MAGIC_NUMBER: &[u8] = compile_time::command_bytes!("echo", "42");
+//! const MAGIC_NUMBER: &str = compile_time::command_str!("echo", "42");
 //!
-//! assert_eq!(MAGIC_NUMBER, b"42\n");
+//! assert_eq!(MAGIC_NUMBER, "42\n");
 //! ```
 #![no_std]
 
