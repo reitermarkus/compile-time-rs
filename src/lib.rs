@@ -32,11 +32,15 @@
 
 pub use compile_time_macros::*;
 
+mod constants {
+  include!(concat!(env!("OUT_DIR"), "/constants.rs"));
+}
+
 /// The host platform triple.
-pub const HOST: &str = env!("HOST");
+pub const HOST: &str = constants::HOST;
 
 /// The target platform triple.
-pub const TARGET: &str = env!("TARGET");
+pub const TARGET: &str = constants::TARGET;
 
 #[doc(hidden)]
 pub mod __re_exports {
