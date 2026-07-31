@@ -5,7 +5,7 @@
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
-use quote::{format_ident, quote, ToTokens};
+use quote::quote;
 
 #[cfg(feature = "command")]
 mod command;
@@ -47,8 +47,8 @@ mod version;
 #[cfg(feature = "time")]
 #[proc_macro]
 pub fn date(input: TokenStream) -> TokenStream {
+  use quote::format_ident;
   use syn::parse_macro_input;
-
   use time::TimeInput;
 
   let input = parse_macro_input!(input as TimeInput);
@@ -297,8 +297,8 @@ pub fn time_str(input: TokenStream) -> TokenStream {
 #[cfg(feature = "time")]
 #[proc_macro]
 pub fn datetime(input: TokenStream) -> TokenStream {
+  use quote::format_ident;
   use syn::parse_macro_input;
-
   use time::TimeInput;
 
   let input = parse_macro_input!(input as TimeInput);
@@ -496,6 +496,8 @@ pub fn rustc_version_str(_item: TokenStream) -> TokenStream {
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version_major(_item: TokenStream) -> TokenStream {
+  use quote::ToTokens;
+
   match version::rustc() {
     Ok(rustc_version) => {
       let major = rustc_version.major;
@@ -517,6 +519,8 @@ pub fn rustc_version_major(_item: TokenStream) -> TokenStream {
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version_minor(_item: TokenStream) -> TokenStream {
+  use quote::ToTokens;
+
   match version::rustc() {
     Ok(rustc_version) => {
       let minor = rustc_version.minor;
@@ -538,6 +542,8 @@ pub fn rustc_version_minor(_item: TokenStream) -> TokenStream {
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version_patch(_item: TokenStream) -> TokenStream {
+  use quote::ToTokens;
+
   match version::rustc() {
     Ok(rustc_version) => {
       let patch = rustc_version.patch;
