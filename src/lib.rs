@@ -37,9 +37,55 @@ mod constants {
 }
 
 /// The host platform triple.
+///
+/// # Examples
+///
+/// When building on Apple Silicon macOS:
+///
+/// ```
+/// # #[cfg(all(host_arch = "aarch64", host_os = "macos"))]
+/// assert_eq!(compile_time::HOST, "aarch64-apple-darwin");
+/// ```
+///
+/// When building on x86 64-bit Linux:
+///
+/// ```
+/// # #[cfg(all(host_arch = "x86_64", host_os = "linux", host_env = "gnu"))]
+/// assert_eq!(compile_time::HOST, "x86_64-unknown-linux-gnu");
+/// ```
+///
+/// When building on x86 64-bit Windows:
+///
+/// ```
+/// # #[cfg(all(host_arch = "x86_64", host_os = "windows", host_env = "msvc"))]
+/// assert_eq!(compile_time::HOST, "x86_64-pc-windows-msvc");
+/// ```
 pub const HOST: &str = constants::HOST;
 
 /// The target platform triple.
+///
+/// # Examples
+///
+/// When building for Apple Silicon macOS:
+///
+/// ```
+/// # #[cfg(all(target_arch = "aarch64", target_os = "macos"))]
+/// assert_eq!(compile_time::TARGET, "aarch64-apple-darwin");
+/// ```
+///
+/// When building for x86 64-bit Linux:
+///
+/// ```
+/// # #[cfg(all(target_arch = "x86_64", target_os = "linux", target_env = "gnu"))]
+/// assert_eq!(compile_time::TARGET, "x86_64-unknown-linux-gnu");
+/// ```
+///
+/// When building for x86 64-bit Windows:
+///
+/// ```
+/// # #[cfg(all(target_arch = "x86_64", target_os = "windows", target_env = "mscv"))]
+/// assert_eq!(compile_time::TARGET, "x86_64-pc-windows-msvc2");
+/// ```
 pub const TARGET: &str = constants::TARGET;
 
 #[doc(hidden)]
