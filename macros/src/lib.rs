@@ -409,7 +409,8 @@ pub fn unix(_input: TokenStream) -> TokenStream {
   .into()
 }
 
-/// Returns the Rust compiler version as [`semver::Version`].
+#[allow(rustdoc::redundant_explicit_links)]
+/// Returns the Rust compiler version as [`semver::Version`](semver::Version).
 ///
 /// # Example
 ///

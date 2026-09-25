@@ -29,11 +29,38 @@
 //! assert_eq!(MAGIC_NUMBER, "42\n");
 //! ```
 #![no_std]
+#![warn(missing_docs)]
 
 pub use compile_time_macros::*;
+pub mod version;
+pub use version::Version;
 
 mod constants {
   include!(concat!(env!("OUT_DIR"), "/constants.rs"));
+}
+
+/// Returns the crate version as [`compile_time::Version`](crate::Version).
+///
+/// # Example
+///
+/// ```
+/// const PKG_VERSION: compile_time::Version = compile_time::pkg_version!();
+///
+/// assert_eq!(PKG_VERSION.major, env!("CARGO_PKG_VERSION_MAJOR").parse().unwrap());
+/// assert_eq!(PKG_VERSION.minor, env!("CARGO_PKG_VERSION_MINOR").parse().unwrap());
+/// assert_eq!(PKG_VERSION.patch, env!("CARGO_PKG_VERSION_PATCH").parse().unwrap());
+/// assert_eq!(PKG_VERSION.pre.as_str(), env!("CARGO_PKG_VERSION_PRE"));
+/// assert!(env!("CARGO_PKG_VERSION").ends_with(PKG_VERSION.build.as_str()));
+/// ```
+#[macro_export]
+macro_rules! pkg_version {
+  () => {
+    if let Ok(version) = $crate::Version::from_str(::core::env!("CARGO_PKG_VERSION")) {
+      version
+    } else {
+      panic!("Failed to parse `CARGO_PKG_VERSION`.")
+    }
+  };
 }
 
 /// The host platform triple.
