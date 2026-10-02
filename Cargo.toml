@@ -2,7 +2,7 @@
 members = ["macros"]
 
 [workspace.package]
-version = "0.3.8"
+version = "0.3.9"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 readme = "ReadMe.md"
@@ -37,5 +37,5 @@ version = ["compile-time-macros/version"]
 command = ["compile-time-macros/command"]
 
 [dependencies]
-compile-time-macros = { version = "=0.3.8", path = "./macros" }
+compile-time-macros = { version = "=0.3.9", path = "./macros" }
 time03 = { workspace = true, features = ["formatting"], optional = true }
