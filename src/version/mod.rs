@@ -1,5 +1,7 @@
 //! A `const` parser for SemVer versions.
 
+use core::fmt;
+
 mod parse;
 
 /// SemVer version as defined by <https://semver.org>.
@@ -21,6 +23,22 @@ impl Version {
   }
 }
 
+impl fmt::Display for Version {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{}.{}.{}", self.major, self.minor, self.patch)?;
+
+    if !self.pre.is_empty() {
+      write!(f, "-{}", self.pre.as_str())?;
+    }
+
+    if !self.build.is_empty() {
+      write!(f, "+{}", self.build.as_str())?;
+    }
+
+    Ok(())
+  }
+}
+
 /// Optional pre-release identifier on a version string. This comes after `-` in a SemVer version, as in `1.0.0-alpha.1`.
 pub struct Prerelease {
   identifier: &'static str,
@@ -28,6 +46,14 @@ pub struct Prerelease {
 
 impl Prerelease {
   pub(self) const EMPTY: Self = Self { identifier: "" };
+
+  #[doc(hidden)]
+  pub const fn from_str(identifier: &'static str) -> Self {
+    match parse::prerelease_identifier(identifier) {
+      Ok((pre_release, rest)) if rest.is_empty() => pre_release,
+      _ => panic!("Failed to parse pre-release."),
+    }
+  }
 
   /// Returns the build metadata as a string.
   pub const fn as_str(&self) -> &'static str {
@@ -46,6 +72,14 @@ pub struct BuildMetadata {
 
 impl BuildMetadata {
   pub(self) const EMPTY: Self = Self { identifier: "" };
+
+  #[doc(hidden)]
+  pub const fn from_str(identifier: &'static str) -> Self {
+    match parse::build_identifier(identifier) {
+      Ok((pre_release, rest)) if rest.is_empty() => pre_release,
+      _ => panic!("Failed to parse build metadata."),
+    }
+  }
 
   /// Returns the build metadata as a string.
   pub const fn as_str(&self) -> &'static str {
