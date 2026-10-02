@@ -410,53 +410,35 @@ pub fn unix(_input: TokenStream) -> TokenStream {
 }
 
 #[allow(rustdoc::redundant_explicit_links)]
-/// Returns the Rust compiler version as [`semver::Version`](semver::Version).
+/// Returns the Rust compiler version as [`compile_time::Version`](compile_time::Version).
 ///
 /// # Example
 ///
 /// ```
-/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
-/// assert_eq!(RUSTC_VERSION, rustc_version::version().unwrap());
+/// const RUSTC_VERSION: compile_time::Version = compile_time::rustc_version!();
+/// let rustc_version = rustc_version::version().unwrap();
+///
+/// assert_eq!(RUSTC_VERSION.major, rustc_version.major);
+/// assert_eq!(RUSTC_VERSION.minor, rustc_version.minor);
+/// assert_eq!(RUSTC_VERSION.patch, rustc_version.patch);
+/// assert_eq!(RUSTC_VERSION.pre.as_str(), rustc_version.pre.as_str());
+/// assert_eq!(RUSTC_VERSION.build.as_str(), rustc_version.build.as_str());
 /// ```
 #[cfg(feature = "version")]
 #[proc_macro]
 pub fn rustc_version(_item: TokenStream) -> TokenStream {
   match version::rustc() {
     Ok(rustc_version::Version { major, minor, patch, pre, build }) => {
-      let semver_prefix = quote! { ::compile_time::__re_exports::semver };
-      let pre = if pre.is_empty() {
-        quote! { #semver_prefix::Prerelease::EMPTY }
-      } else {
-        let pre = pre.as_str();
-        quote! {
-          if let Ok(pre) = #semver_prefix::Prerelease::new(#pre) {
-            pre
-          } else {
-            ::core::unreachable!()
-          }
-        }
-      };
-
-      let build = if build.is_empty() {
-        quote! { #semver_prefix::BuildMetadata::EMPTY }
-      } else {
-        let build = build.as_str();
-        quote! {
-          if let Ok(build) = #semver_prefix::BuildMetadata::new(#build) {
-            build
-          } else {
-            ::core::unreachable!()
-          }
-        }
-      };
+      let pre = pre.as_str();
+      let build = build.as_str();
 
       quote! {
-        #semver_prefix::Version {
+        ::compile_time::Version {
           major: #major,
           minor: #minor,
           patch: #patch,
-          pre: #pre,
-          build: #build,
+          pre: ::compile_time::version::Prerelease::from_str(#pre),
+          build: ::compile_time::version::BuildMetadata::from_str(#build),
         }
       }
     },
@@ -471,7 +453,7 @@ pub fn rustc_version(_item: TokenStream) -> TokenStream {
 ///
 /// ```
 /// const RUSTC_VERSION_STRING: &str = compile_time::rustc_version_str!();
-/// assert_eq!(RUSTC_VERSION_STRING, compile_time::rustc_version_str!());
+/// assert_eq!(RUSTC_VERSION_STRING, compile_time::rustc_version!().to_string());
 /// ```
 #[cfg(feature = "version")]
 #[proc_macro]
@@ -491,7 +473,7 @@ pub fn rustc_version_str(_item: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// const RUSTC_VERSION: compile_time::Version = compile_time::rustc_version!();
 /// assert_eq!(RUSTC_VERSION.major, compile_time::rustc_version_major!());
 /// ```
 #[cfg(feature = "version")]
@@ -514,7 +496,7 @@ pub fn rustc_version_major(_item: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// const RUSTC_VERSION: compile_time::Version = compile_time::rustc_version!();
 /// assert_eq!(RUSTC_VERSION.minor, compile_time::rustc_version_minor!());
 /// ```
 #[cfg(feature = "version")]
@@ -537,7 +519,7 @@ pub fn rustc_version_minor(_item: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// const RUSTC_VERSION: compile_time::Version = compile_time::rustc_version!();
 /// assert_eq!(RUSTC_VERSION.minor, compile_time::rustc_version_minor!());
 /// ```
 #[cfg(feature = "version")]
@@ -560,7 +542,7 @@ pub fn rustc_version_patch(_item: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// const RUSTC_VERSION: compile_time::Version = compile_time::rustc_version!();
 /// assert_eq!(RUSTC_VERSION.pre.as_str(), compile_time::rustc_version_pre!());
 /// ```
 #[cfg(feature = "version")]
@@ -581,7 +563,7 @@ pub fn rustc_version_pre(_item: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```
-/// const RUSTC_VERSION: semver::Version = compile_time::rustc_version!();
+/// const RUSTC_VERSION: compile_time::Version = compile_time::rustc_version!();
 /// assert_eq!(RUSTC_VERSION.build.as_str(), compile_time::rustc_version_build!());
 /// ```
 #[cfg(feature = "version")]

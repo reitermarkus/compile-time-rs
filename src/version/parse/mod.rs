@@ -113,7 +113,7 @@ impl Version {
   }
 }
 
-const fn prerelease_identifier(input: &'static str) -> Result<(Prerelease, &'static str), Error> {
+pub(super) const fn prerelease_identifier(input: &'static str) -> Result<(Prerelease, &'static str), Error> {
   match identifier(input, Position::Pre) {
     Ok((string, rest)) => {
       let identifier = string;
@@ -123,7 +123,7 @@ const fn prerelease_identifier(input: &'static str) -> Result<(Prerelease, &'sta
   }
 }
 
-const fn build_identifier(input: &'static str) -> Result<(BuildMetadata, &'static str), Error> {
+pub(super) const fn build_identifier(input: &'static str) -> Result<(BuildMetadata, &'static str), Error> {
   match identifier(input, Position::Build) {
     Ok((string, rest)) => {
       let identifier = string;

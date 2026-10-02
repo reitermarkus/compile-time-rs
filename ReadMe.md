@@ -8,7 +8,7 @@ This crate provides macros for getting compile time information.
 You can get the compile time either as `time::Date`, `time::Time`,
 `time::OffsetDateTime`, string, or UNIX timestamp.
 
-You can get the Rust compiler version either as `semver::Version` or string,
+You can get the Rust compiler version either as `compile_time::Version` or string,
 and the individual version parts as integer literals or strings, respectively.
 
 You can run arbitrary command at compile time and get its output as bytes or string.
