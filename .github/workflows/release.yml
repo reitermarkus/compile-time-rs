@@ -58,6 +58,10 @@ jobs:
         with:
           client-id: ${{ secrets.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_KEY }}
+      # FIXME: Setting `CARGO_BUILD_TARGET` does not override `.cargo/config.toml`,
+      #        see https://github.com/rust-lang/cargo/issues/14820.
+      - name: Remove config
+        run: rm .cargo/config.toml
       - name: Run release-plz
         uses: release-plz/action@b8d6b54b02889ff2ae2bb82e8b57c3a8fc1683a5 # v0.5
         with:
