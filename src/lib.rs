@@ -117,8 +117,6 @@ pub const TARGET: &str = constants::TARGET;
 
 #[doc(hidden)]
 pub mod __re_exports {
-  #[cfg(feature = "version")]
-  pub use semver;
   #[cfg(feature = "time")]
   pub use time03 as time;
 }

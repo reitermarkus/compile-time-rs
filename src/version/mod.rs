@@ -6,8 +6,8 @@ mod parse;
 
 /// SemVer version as defined by <https://semver.org>.
 ///
-/// This type exists because [`semver::Version`] cannot be `const`-constructed.
-/// The API exposed by this type is a subset of [`semver::Version`].
+/// This type exists because [`semver::Version`](semver::Version) cannot be `const`-constructed.
+/// The API exposed by this type is a subset of [`semver::Version`](semver::Version).
 #[allow(missing_docs)]
 pub struct Version {
   pub major: u64,
