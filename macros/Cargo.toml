@@ -20,7 +20,7 @@ proc-macro = true
 [features]
 default = ["time", "version", "command"]
 time = ["dep:time03"]
-version = ["dep:rustc_version", "dep:semver"]
+version = ["dep:rustc_version"]
 command = ["dep:macro-string"]
 
 [dependencies]
@@ -29,7 +29,6 @@ syn = "3"
 quote = "1.0"
 rustc_version = { version = "0.4", optional = true }
 time03 = { workspace = true, features = ["formatting", "local-offset"], optional = true }
-semver = { workspace = true, optional = true }
 macro-string = { version = "0.3", optional = true }
 
 [dev-dependencies]
